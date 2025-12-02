@@ -1,0 +1,86 @@
+# ======================================
+# BACKEND NODE.JS - LO MÁS IMPORTANTE
+# ======================================
+
+# 1. CARPETAS QUE NUNCA DEBEN SUBIRSE
+node_modules/          # ¡Esta pesa cientos de MB!
+dist/                  # Si usas TypeScript/compilación
+build/                 # Carpeta de builds
+coverage/              # Reportes de tests
+
+# 2. ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+.env                   # Variables de entorno
+.env.local
+.env.development
+.env.production
+.env.test
+.env.example           # O déjalo si es plantilla vacía
+
+# 3. ARCHIVOS DE CLAVES Y CERTIFICADOS
+*.key
+*.pem
+*.crt
+*.cert
+config.js              # Si tiene datos sensibles
+config/
+keys/
+secrets/
+credentials/
+
+# 4. ARCHIVOS DEL SISTEMA
+.DS_Store              # macOS
+Thumbs.db              # Windows
+desktop.ini
+
+# 5. ARCHIVOS DE LOGS
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 6. CARPETAS DE EDITORES/IDEs
+.vscode/
+.idea/
+.settings/
+*.swp
+*.swo
+
+# ======================================
+# FRONTEND (si tienes)
+# ======================================
+.sass-cache/
+*.css.map
+*.sass.map
+.cache/
+
+# ======================================
+# CONFIGURACIONES ESPECÍFICAS DE PAGOS
+# ======================================
+
+# 1. Archivos de configuración de APIs de pago
+payment-config.js
+stripe-config.json
+paypal-keys.js
+mercadopago-credentials/
+
+# 2. Webhooks locales (si los pruebas localmente)
+webhook.log
+payment-logs/
+
+# 3. Archivos temporales de transacciones
+tmp/
+temp/
+uploads/               # Si subes archivos
+
+# 4. Base de datos local (si usas SQLite o similar)
+*.db
+*.sqlite
+*.sqlite3
+
+# ======================================
+# TU PROYECTO EN PARTICULAR
+# ======================================
+
+# Agrega aquí carpetas específicas de TU proyecto
+# Ejemplo:
+# mi-carpeta-temporal/
+# archivos-de-prueba/

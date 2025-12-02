@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reusate</title>
+    <style>
+        /* ===== PANTALLA DE CARGA ===== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-bar-container {
+            width: 200px;
+            height: 4px;
+            background-color: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #000000;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            font-family: 'olo', sans-serif;
+            color: #000000;
+            font-size: 14px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* ===== ESTILOS GENERALES ===== */
+        @font-face {
+        font-family: 'olo';
+        src: url(font/SpecialGothicExpandedOne-Regular.ttf);
+        }
+        
+        body {
+            font-family: 'olo';
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #000000;
+            cursor: url('img/Pokeball_normal_select.cur'), auto;
+            text-align: center;
+        }
+        
+        .ContactUs{
+            cursor: url('img/pink coursor.png'), pointer;
+            width: 60px;
+            height: auto;
+            margin-top: 70px;
+            align-items: center;            
+        }
+        
+        /* Cursor personalizado para elementos clickables */
+        a, button, .add-to-cart, .menu a {
+            cursor: url('img/pink coursor.png'), pointer;
+        }
+        
+        /* ===== MENÚ SUPERIOR ===== */
+        .menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            padding: 15px 0;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgb(0, 0, 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .menu a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .menu a:hover {
+            color: #e8ff17;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Icono del carrito */
+        .cart-icon {
+            position: absolute;
+            right: 20px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Contador de items en el carrito */
+        .cart-count {
+            background-color: #fc1a1a;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        /* Estilos para el banner animado */
+        #shopify-section-bannerscroll {
+            position: relative;
+            width: 100%;
+            left: 0;
+            right: 0;
+            margin-left: 0;
+            margin-right: 0;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        /* Container de rolagem */
+        .scrolly-wrap {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            padding: 0;
+        }
+
+        .scrolly-slide {
+            display: inline-block;
+            animation: scrollyAnim 96s linear infinite;
+        }
+
+        .scrolly-img {
+            max-width: auto;
+            height: 32px;
+            margin-right: -6px;
+            border: none;
+            vertical-align: top;
+        }
+
+        .scrolly-wrap:hover .scrolly-slide {
+            animation-play-state: paused;
+        }
+
+        @keyframes scrollyAnim {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-100%); }
+        }
+
+        @media (min-width: 767px) {
+            .scrolly-mobile { display: none; }
+            .scrolly-desktop { display: block; }
+        }
+        
+        @media (max-width: 766px) {
+            .scrolly-desktop { display: none; }
+            .scrolly-mobile { display: block; }
+        }
+        
+        /* ===== CONTENEDOR PRINCIPAL ===== */
+        .container {
+            margin-top: 50px;
+            padding: 28px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* ===== CARRUSEL DE IMÁGENES ===== */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            scale: 1;
+            margin: 0 auto;
+            margin-top: -30px;
+            overflow: hidden;   
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0);
+            text-align: left;
+        }
+        
+        /* Contenedor de slides (imágenes) */
+        .carousel {
+            display: flex;
+            transition: transform 0.7s ease-in-out;
+            height: 500px;
+        }
+        
+        /* Cada slide individual */
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+        }
+        
+        /* Estilo para las imágenes del carrusel */
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Capa del GIF que aparece al pasar el mouse */
+        /*.carousel-slide .gif-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }*/
+        
+        /* Mostrar GIF cuando el mouse está sobre la imagen */
+        .carousel-slide:hover .gif-overlay {
+            opacity: 1;
+        }
+        
+        /* Información de la obra (aparece desde abajo) */
+        .artwork-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            color: rgb(255, 255, 255);
+            text-shadow: 2px 2px 4px #000000;
+            border: dashed 6px #000000;
+            padding: 15px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Mostrar información al pasar el mouse */
+        .carousel-slide:hover .artwork-info {
+            transform: translateY(0);
+        }
+        
+        /* Botones de navegación del carrusel */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgb(0, 0, 0);
+            color: white;
+            border: none;
+            font-size: 24px;
+            padding: 15px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .carousel-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Posición del botón anterior */
+        #prevBtn {
+            left: 20px;
+        }
+        
+        /* Posición del botón siguiente */
+        #nextBtn {
+            right: 20px;
+        }
+        
+        /* Indicadores de posición (puntos abajo) */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        /* Estilo de cada indicador */
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgb(168, 168, 168);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        /* Indicador activo */
+        .indicator.active {
+            background: black;
+            transform: scale(1.2);
+        }
+        
+        /* ===== ICONO DE AÑADIR AL CARRITO ===== */
+        .add-to-cart-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            margin-top: 20px;
+            margin-left: 40px
+            
+            
+        }
+        
+        .add-to-cart-icon:hover {
+            background: #e0555500;
+            transform: scale(1.9);
+        }
+        
+        /* Crear el icono de carrito con CSS */
+        .cart-icon-symbol {
+            position: center;
+            scale: calc(4.5);
+            width: 15px;
+            height: 15px;
+        }
+        
+        .cart-icon-symbol::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            border: 0px solid rgba(255, 255, 255, 0);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            top: 0;
+            left: 0;
+        }
+        
+        .cart-icon-symbol::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0);
+            border-radius: 0%;
+            bottom: 0;
+            left: 3px;
+            box-shadow: 8px 0 0 rgba(255, 255, 255, 0);
+        }
+        
+        /* Efecto de añadido al carrito */
+        .add-to-cart-icon.added::after {
+            content: '';
+            position: absolute;
+            color: rgba(255, 255, 255, 0);
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .add-to-cart-icon.added .cart-icon-symbol {
+            opacity: 0;
+        }
+        
+        .view-more {
+            margin: 5%;
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        
+        .view-more:hover {
+            background-color: rgb(46, 60, 255);
+        }
+        
+        /* Información del producto */
+        .product-info {
+            flex-grow: 1;
+            text-align: left
+        }
+        
+        .product-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 35px;
+            text-shadow: #000000;
+        }
+        
+        .product-info p {
+            margin: 10px;
+            margin-left: 50px;
+            font-size: 20px;
+            color: rgb(255, 251, 0);
+            text-shadow: #000000;
+        }
+        
+        /* ===== PIE DE PÁGINA ===== */
+        footer {
+            text-align: center;
+            padding: 18px;
+            color: rgb(0, 0, 0);
+            margin-top: 40px;
+            background-image: url('gojira/akira1.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* ===== CARRITO DE COMPRAS ===== */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: right 0.3s;
+            padding: 20px;
+            overflow-y: auto;
+            color: #333;
+        }
+        
+        /* Clase para mostrar el carrito */
+        .cart-sidebar.active {
+            right: 0;
+        }
+        
+        /* Clase para el estado minimizado */
+        .cart-sidebar.minimized {
+            right: -300px;
+            width: 50px;
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        /* Botones para minimizar/maximizar */
+        .minimize-btn, .maximize-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+        
+        /* Botón maximizar inicialmente oculto */
+        .maximize-btn {
+            display: none;
+        }
+        
+        /* Ocultar botón minimizar cuando está minimizado */
+        .cart-sidebar.minimized .minimize-btn {
+            display: none;
+        }
+        
+        /* Mostrar botón maximizar cuando está minimizado */
+        .cart-sidebar.minimized .maximize-btn {
+            display: block;
+            left: 5px;
+        }
+        
+        /* Ocultar contenido cuando está minimizado */
+        .cart-sidebar.minimized .cart-content {
+            display: none;
+        }
+        
+        /* Mostrar solo icono cuando está minimizado */
+        .cart-sidebar.minimized .cart-icon-mini {
+            display: block;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 24px;
+            position: relative;
+        }
+        
+        /* Contador en el icono minimizado */
+        .cart-icon-mini .cart-count-mini {
+            position: absolute;
+            top: -10px;
+            right: 30px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        /* Icono minimizado inicialmente oculto */
+        .cart-icon-mini {
+            display: none
+        }
+        
+        /* Items del carrito */
+        .cart-item {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 50px;
+        }
+        
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        
+        /* Botón para eliminar items */
+        .remove-item {
+            color: #ff6b6b;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 16px;
+        }
+        
+        /* Total del carrito */
+        .cart-total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        /* Botón de pago */
+        .checkout-btn {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            border: solid 6px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background-color: rgb(255, 243, 136);
+        }
+        
+        /* Fondo oscuro cuando el carrito está abierto */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Mostrar overlay cuando el carrito está activo */
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Estilos para el botón de PayPal */
+        #paypal-button-container {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        /* Ocultar botón simulado de PayPal */
+        #paypal-checkout {
+            display: none;
+        }
+    </style>
+    <!-- SDK de PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AWqMX_VC9t0IQcUX9FvPNstYRWMe1qdIu6bXZb09ymhKsilKLW-b7NB8bMbwM_IBgRBLcM1Wm63zzdEntest&currency=MXN"></script>
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div id="loading-screen">
+        <img src="gifs/Finalg.gif" alt="Reusate" class="loading-logo">
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loading-bar"></div>
+        </div>
+        <div class="loading-text" id="loading-text">Cargando...</div>
+    </div>
+    
+    <!-- Menú fijo superior -->
+    <nav class="menu">
+        <img src="gifs/Finalg.gif" alt="Logo CHCS" style="height:40px; margin-right:20px; position:absolute; left:20px; top:50%; transform:translateY(-50%);">
+        <div class="menu-container" style="background-color: rgb(255, 255, 255);background-image: url();">
+        <a href="https://www.instagram.com/reusate/" target="_blank" rel="noopener noreferrer">IG</a>
+            <a href="o.html">[chanel]</a>
+            <a href="contacto.html">Us</a>
+        </div>
+        <!-- Icono del carrito con contador -->
+        <div class="cart-icon" id="cart-icon">
+            🛒 <span class="cart-count" id="cart-count">0</span>
+        </div>
+    </nav>
+    
+    <!-- Overlay (fondo oscuro cuando el carrito está abierto) -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Sidebar del carrito (inicia minimizado) -->
+    <div class="cart-sidebar minimized" id="cart-sidebar">
+        <!-- Botones para minimizar/maximizar -->
+        <button class="minimize-btn" id="minimize-btn">➖</button>
+        <button class="maximize-btn" id="maximize-btn">➕</button>
+        
+        <!-- Icono del carrito cuando está minimizado -->
+        <div class="cart-icon-mini" id="cart-icon-mini">
+            🛒 <span class="cart-count-mini" id="cart-count-mini">0</span>
+        </div>
+        
+        <!-- Contenido del carrito -->
+        <div class="cart-content">
+            <h2>Tu Carrito</h2>
+            <div id="cart-items"></div>
+            <div class="cart-total">Total: $<span id="cart-total">0</span></div>
+            <!-- Botón simulado de PayPal (mantenido para compatibilidad) -->
+            <button class="checkout-btn" id="paypal-checkout">Pagar con PayPal</button>
+            <!-- Contenedor para el botón real de PayPal -->
+            <div id="paypal-button-container"></div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal de la página -->
+    <div class="container" id="inicio">
+
+        <!-- Desktop -->
+<div class="scrolly-wrap scrolly-desktop" role="region" aria-label="Rolagem de imagens desktop">
+  <a href="/collections/all">
+    <div class="scrolly-slide scrolly-desktop-slide">
+      <img src="gojira/publi1111.gif" alt="" class="scrolly-img">
+    <img src="gojira/publi1111.gif" alt="" class="scrolly-img">
+    </div>
+  </a>
+</div>
+
+<!-- Mobile -->
+<!--<div class="scrolly-wrap scrolly-mobile" role="region" aria-label="Rolagem de imagens mobile">
+  <a href="/collections/all">
+    <div class="scrolly-slide scrolly-mobile-slide">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+      <img src="//palida-studios.com/cdn/shop/files/ANUN1.png?v=1756512966" alt="Promoção" class="scrolly-img">
+    </div>
+  </a>
+</div> -->
+        
+        
+        <!-- Sección de galería con carrusel -->
+        <section id="galeria" style="margin-top: 0px;">
+            <h2 style="text-align: center; margin-bottom: 30px;"></h2>
+            <div class="carousel-container">
+                <!-- Contenedor del carrusel -->
+                <div class="carousel" id="carousel">
+                    <!-- Slide 1 (con botón "Ver más") -->
+                    <div class="carousel-slide">
+                        <img src="img shop/truck.jpg" alt="Diseño de tatuaje 1">
+                        <img src="https://ejemplo.com/tatuaje1.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3>hi world</h3>
+                            </div>
+                            <button class="view-more" onclick="window.location.href='ll-01.html'">NFSW</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 2 (con icono de carrito) -->
+                    <div class="carousel-slide">
+                        <img src="img shop/hi-worldd.jpg" alt="Diseño de tatuaje 2">
+                        <img src="https://ejemplo.com/tatuaje2.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3>sticker pack</h3>
+                                <p>$99.00</p>
+                            </div>
+                            <button class="add-to-cart-icon" data-id="2" data-name="Sticker Pack" data-price="99" data-image="img shop/hi-worldd.jpg">
+                                <div class="cart-icon-symbol">🙏🏾</div>
+                            </button>
+                            <button class="view-more" onclick="window.location.href='ll-02.html'">stikkk</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 3 (con icono de carrito) -->
+                    <div class="carousel-slide">
+                        <img src="img shop/Fanzine.jpg" alt="Diseño de tatuaje 3">
+                        <img src="https://ejemplo.com/tatuaje3.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3>fanzine</h3>
+                                <p>$99.00</p>
+                            </div>
+                            <button class="add-to-cart-icon" data-id="3" data-name="Fanzine" data-price="99" data-image="img shop/Fanzine.jpg">
+                                <div class="cart-icon-symbol">🥷</div>
+                            </button>
+                            <button class="view-more" onclick="window.location.href='ll-03.html'">owo</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4 (con icono de carrito) -->
+                    <div class="carousel-slide">
+                        <img src="img shop/metro-card.jpg" alt="Diseño de tatuaje 4">
+                        <img src="https://ejemplo.com/tatuaje4.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3>CDMX card</h3>
+                                <p>$55.00</p>
+                            </div>
+                            <button class="add-to-cart-icon" data-id="4" data-name="CDMX Card" data-price="55" data-image="img shop/metro-card.jpg">
+                                <div class="cart-icon-symbol">♻</div>
+                            </button>
+                            <button class="view-more" onclick="window.location.href='ll-04.html'">turist</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 5 (con botón "Ver más") -->
+                    <div class="carousel-slide">
+                        <img src="img shop/chcstick.jpg" alt="Diseño de tatuaje 5">
+                        <img src="https://ejemplo.com/tatuaje5.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3></h3>
+                            </div>
+                            <button class="view-more" onclick="window.location.href='portfolio.html'">CHCScap01</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 6 (sin botones) -->
+                    <div class="carousel-slide">
+                        <img src="img shop/chcstickk.jpg" alt="Diseño de tatuaje 6">
+                        <img src="https://ejemplo.com/tatuaje6.gif" alt="" class="gif-overlay">
+                        
+                    </div>
+
+                    <!-- Slide 7 (con icono de carrito) -->
+                    <div class="carousel-slide">
+                        <img src="img shop/gojira420.jpg" alt="Diseño de tatuaje 4">
+                        <img src="https://ejemplo.com/tatuaje4.gif" alt="" class="gif-overlay">
+                        <div class="artwork-info">
+                            <div class="product-info">
+                                <h3>Stasher</h3>
+                                <p>$420.00</p>
+                            </div>
+                            <button class="add-to-cart-icon" data-id="5" data-name="Stasher" data-price="420" data-image="img shop/gojira420.jpg">
+                                <div class="cart-icon-symbol">⚠</div>
+                            </button>
+                            <button class="view-more" onclick="window.location.href='ll-05.html'">More</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de navegación del carrusel -->
+                <button class="carousel-btn" id="prevBtn">❮</button>
+                <button class="carousel-btn" id="nextBtn">❯</button>
+                
+                <!-- Indicadores de posición -->
+                <div class="carousel-indicators" id="indicators">
+                    <!-- Los indicadores se generan automáticamente con JavaScript -->
+                </div>
+            </div>
+        </section>
+        <!--
+        <header>
+            <h1 style="text-align: center; margin-top: 20px;"><img src="gojira/reusate.gif" alt=""></h1>
+            <p style="text-align: center;"></p>
+        </header>-->
+        
+        <!-- Imagen tamaño infantil -->
+        <div style="display: flex; justify-content: center; margin-top: 40px;">
+            <img src="gojira/A veces.jpg" alt="Foto tamaño infantil" style="width: 5cm; height: 6cm; object-fit:cover; border:1px solid #ccc; border-radius:4px;">
+        </div>
+
+        <!-- Sección "Sobre mí" -->
+        <section id="sobre" style="margin-top: 10px;"> 
+            <h2>REUSATE ♡</h2>
+            <p>Reusate habita entre la ficcion y la distopia de existir en el DF. </p>
+            <p>Entre tantos espacios la calle es donde estamos</p>      
+         </section>
+
+         <img src="./img/Icon_25.gif" alt="" class="ContactUs" onclick="window.location.href='contacto.html'"
+
+         
+         
+    <!-- Pie de página -->
+    <footer>
+        <p>&copy; GOJIRA CORP</p>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+   
+<script>
+    // ===== PANTALLA DE CARGA =====
+    const loadingScreen = document.getElementById('loading-screen');
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingText = document.getElementById('loading-text');
+    
+    // Simular progreso de carga
+    let progress = 0;
+    const loadingInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        loadingBar.style.width = `${progress}%`;
+        
+        if (progress < 30) {
+            loadingText.textContent = "Hola mundo";
+        } else if (progress < 70) {
+            loadingText.textContent = "Gojira Corp";
+        } else {
+            loadingText.textContent = "¡Bienvenido!";
+        }
+        
+        if (progress === 100) {
+            clearInterval(loadingInterval);
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 500);
+        }
+    }, 300);
+    
+    // ===== CARRUSEL =====
+    const carousel = document.getElementById('carousel');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const indicatorsContainer = document.getElementById('indicators');
+    
+    let currentIndex = 0;
+    let slideInterval;
+    const slideDelay = 5000;
+    
+    function createIndicators() {
+        slides.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            if (index === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => goToSlide(index));
+            indicatorsContainer.appendChild(indicator);
+        });
+    }
+
+    (function() {
+    var d = document.querySelector('.scrolly-desktop-slide');
+    if (d) d.parentNode.appendChild(d.cloneNode(true));
+    var m = document.querySelector('.scrolly-mobile-slide');
+    if (m) m.parentNode.appendChild(m.cloneNode(true));
+  })();
+    
+    function startCarousel() {
+        slideInterval = setInterval(() => {
+            goToSlide((currentIndex + 1) % slides.length);
+        }, slideDelay);
+    }
+    
+    function stopCarousel() {
+        clearInterval(slideInterval);
+    }
+    
+    function goToSlide(index) {
+        currentIndex = index;
+        updateCarousel();
+    }
+    
+    function updateCarousel() {
+        carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        document.querySelectorAll('.indicator').forEach((indicator, index) => {
+            if (index === currentIndex) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+        
+        stopCarousel();
+        startCarousel();
+    }
+    
+    prevBtn.addEventListener('click', () => {
+        goToSlide((currentIndex - 1 + slides.length) % slides.length);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        goToSlide((currentIndex + 1) % slides.length);
+    });
+    
+    carousel.addEventListener('mouseenter', stopCarousel);
+    carousel.addEventListener('mouseleave', startCarousel);
+    
+    // ===== CARRITO DE COMPRAS =====
+    const cartIcon = document.getElementById('cart-icon');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const overlay = document.getElementById('overlay');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartCountMini = document.getElementById('cart-count-mini');
+    const cartTotal = document.getElementById('cart-total');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-icon');
+    const minimizeBtn = document.getElementById('minimize-btn');
+    const maximizeBtn = document.getElementById('maximize-btn');
+    const cartIconMini = document.getElementById('cart-icon-mini');
+    
+    let cart = [];
+    
+    // Abrir/cerrar carrito
+    cartIcon.addEventListener('click', () => {
+        cartSidebar.classList.add('active');
+        cartSidebar.classList.remove('minimized');
+        overlay.classList.add('active');
+    });
+    
+    overlay.addEventListener('click', () => {
+        cartSidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+    
+    // Minimizar/maximizar carrito
+    minimizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cartSidebar.classList.add('minimized');
+    });
+    
+    maximizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cartSidebar.classList.remove('minimized');
+    });
+    
+    cartIconMini.addEventListener('click', () => {
+        cartSidebar.classList.remove('minimized');
+    });
+    
+    // Añadir productos al carrito
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+            const price = parseFloat(this.getAttribute('data-price'));
+            const image = this.getAttribute('data-image');
+            
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id,
+                    name,
+                    price,
+                    image,
+                    quantity: 1
+                });
+            }
+            
+            // Efecto visual de añadido
+            this.classList.add('added');
+            setTimeout(() => {
+                this.classList.remove('added');
+            }, 1000);
+            
+            updateCart();
+            
+            cartSidebar.classList.remove('minimized');
+            cartSidebar.classList.add('active');
+            overlay.classList.add('active');
+        });
+    });
+    
+    // Actualizar carrito
+    function updateCart() {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        cartCountMini.textContent = totalItems;
+        
+        cartItemsContainer.innerHTML = '';
+        
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '<p>Tu carrito está vacío</p>';
+            cartTotal.textContent = '0';
+            return;
+        }
+        
+        let total = 0;
+        
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            const cartItemElement = document.createElement('div');
+            cartItemElement.className = 'cart-item';
+            cartItemElement.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item-details">
+                    <h3>${item.name}</h3>
+                    <p>$${item.price} x ${item.quantity} = $${itemTotal.toFixed(2)}</p>
+                </div>
+                <button class="remove-item" data-id="${item.id}">✕</button>
+            `;
+            
+            cartItemsContainer.appendChild(cartItemElement);
+        });
+        
+        cartTotal.textContent = total.toFixed(2);
+        
+        document.querySelectorAll('.remove-item').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                cart = cart.filter(item => item.id !== id);
+                updateCart();
+            });
+        });
+    }
+    
+    // ===== FORMULARIO DE PEDIDO =====
+    function showOrderForm() {
+        if (cart.length === 0) {
+            alert('Tu carrito está vacío');
+            return;
+        }
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Crear formulario
+        const formHTML = `
+            <div class="order-form-overlay">
+                <div class="order-form">
+                    <h2>Completar Pedido</h2>
+                    <p>Total: <strong>$${total.toFixed(2)} MXN</strong></p>
+                    
+                    <form id="customer-form">
+                        <div class="form-group">
+                            <label>Nombre completo:</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Teléfono:</label>
+                            <input type="tel" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Dirección de envío:</label>
+                            <textarea name="address" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Método de pago:</label>
+                            <select name="paymentMethod" required>
+                                <option value="">Selecciona...</option>
+                                <option value="transferencia">Transferencia bancaria</option>
+                                <option value="efectivo">Pago en efectivo</option>
+                                <option value="paypal">PayPal</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="cancel-btn">Cancelar</button>
+                            <button type="submit" class="submit-btn">Enviar Pedido</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        // Añadir formulario al body
+        document.body.insertAdjacentHTML('beforeend', formHTML);
+        
+        // Estilos para el formulario
+        const style = document.createElement('style');
+        style.textContent = `
+            .order-form-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url('gojira/A veces.jpg');
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+            }
+            
+            .order-form {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            
+            .form-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            
+            .cancel-btn, .submit-btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                flex: 1;
+            }
+            
+            .cancel-btn {
+                background: #DBC2CF;
+                color: white;
+            }
+            
+            .submit-btn {
+                background: #3BCEAC;
+                color: white;
+            }
+                {/* ===== FORMULARIO DE PEDIDO ===== */
+.order-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.order-form {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: "verdana", sans-serif;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancel-btn, .submit-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+    font-size: 16px;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+}
+
+.submit-btn {
+    background: #28a745;
+    color: white;
+}
+
+.submit-btn:hover {
+    background: #218838;
+}
+
+.submit-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Mostrar botón de checkout */
+#paypal-checkout {
+    display: block !important;
+}
+        `;
+        document.head.appendChild(style);
+        
+        // Eventos del formulario
+        const overlay = document.querySelector('.order-form-overlay');
+        const form = document.getElementById('customer-form');
+        const cancelBtn = document.querySelector('.cancel-btn');
+        
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            document.head.removeChild(style);
+        });
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const customerInfo = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                paymentMethod: formData.get('paymentMethod')
+            };
+            
+            processOrder(customerInfo);
+        });
+    }
+    
+    // Procesar pedido
+    function processOrder(customerInfo) {
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Mostrar loading
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.textContent = 'Procesando...';
+        submitBtn.disabled = true;
+        
+        // Enviar al servidor
+        fetch('/api/process-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cart: cart,
+                total: total,
+                customerInfo: customerInfo
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ ¡Pedido completado!\n\nNúmero de pedido: ${data.orderId}\nTe contactaremos pronto para coordinar el pago y envío.`);
+                
+                // Limpiar carrito
+                cart = [];
+                updateCart();
+                
+                // Cerrar todo
+                document.querySelector('.order-form-overlay').remove();
+                cartSidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                throw new Error('Error en el servidor');
+            }
+        })
+        .catch(error => {
+            alert('❌ Error al procesar el pedido. Por favor, intenta de nuevo o contáctanos directamente.');
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            submitBtn.textContent = 'Enviar Pedido';
+            submitBtn.disabled = false;
+        });
+    }
+    
+    // ===== BOTÓN DE PAGO ACTUALIZADO =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reemplazar el botón de PayPal por nuestro nuevo botón
+        const paypalButtonContainer = document.getElementById('paypal-button-container');
+        const paypalCheckout = document.getElementById('paypal-checkout');
+        
+           
+        if (paypalButtonContainer) {
+            paypalButtonContainer.innerHTML = '';
+            const newButton = document.createElement('button');
+            newButton.className = 'checkout-btn';
+            newButton.textContent = 'Finalizar Compra';
+            newButton.addEventListener('click', showOrderForm);
+            paypalButtonContainer.appendChild(newButton);
+        }
+    });
+    
+    // Inicializar
+    createIndicators();
+    startCarousel();
+    updateCart();
+</script>
+</body>
+</html>
